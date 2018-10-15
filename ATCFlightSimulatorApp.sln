@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2016
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ATCFlightSimulatorApp", "ATCFlightSimulatorApp\ATCFlightSimulatorApp.csproj", "{AE4520A7-2267-4525-95FD-8F979CEE558F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ATCSimulator.Core", "ATCSimulator.Core\ATCSimulator.Core.csproj", "{2658BF8F-0441-41BC-B369-754E7BE20AAC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlightSimulator.Core", "FlightSimulator.Core\FlightSimulator.Core.csproj", "{EEE41317-911C-401E-82F9-CC92A9117BCD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AE4520A7-2267-4525-95FD-8F979CEE558F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE4520A7-2267-4525-95FD-8F979CEE558F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE4520A7-2267-4525-95FD-8F979CEE558F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE4520A7-2267-4525-95FD-8F979CEE558F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2658BF8F-0441-41BC-B369-754E7BE20AAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2658BF8F-0441-41BC-B369-754E7BE20AAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2658BF8F-0441-41BC-B369-754E7BE20AAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2658BF8F-0441-41BC-B369-754E7BE20AAC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEE41317-911C-401E-82F9-CC92A9117BCD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEE41317-911C-401E-82F9-CC92A9117BCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEE41317-911C-401E-82F9-CC92A9117BCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEE41317-911C-401E-82F9-CC92A9117BCD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6B7AA827-96FD-4B10-B456-DE34329BD1B4}
+	EndGlobalSection
+EndGlobal
