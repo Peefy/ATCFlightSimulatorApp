@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="Models\ConnectPacket.cs" />
     <Compile Include="Models\ReadyPacket.cs" />
+    <Compile Include="Models\RoutePoint.cs" />
     <Compile Include="Models\RunControlPacket.cs" />
     <Compile Include="Models\ScenarioPacket.cs" />
     <Compile Include="Models\TimeTampPacket.cs" />

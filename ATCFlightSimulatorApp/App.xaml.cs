@@ -6,6 +6,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
+using Autofac;
+
+using ATCFlightSimulatorApp.Services;
+
 namespace ATCFlightSimulatorApp
 {
     /// <summary>

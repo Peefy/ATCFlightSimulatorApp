@@ -1,12 +1,15 @@
-﻿using ATCFlightSimulatorApp.Views;
+﻿
 using System.Windows;
 using Prism.Modularity;
-using Autofac;
 using Prism.Autofac;
+using Autofac;
+
+using ATCFlightSimulatorApp.Views;
+using ATCFlightSimulatorApp.Services;
 
 namespace ATCFlightSimulatorApp
 {
-    class Bootstrapper : AutofacBootstrapper
+    public class Bootstrapper : AutofacBootstrapper
     {
         protected override DependencyObject CreateShell()
         {
@@ -14,14 +17,20 @@ namespace ATCFlightSimulatorApp
         }
 
         protected override void InitializeShell()
-        {
+        { 
             Application.Current.MainWindow.Show();
         }
 
         protected override void ConfigureModuleCatalog()
         {
             var moduleCatalog = (ModuleCatalog)ModuleCatalog;
-            //moduleCatalog.AddModule(typeof(YOUR_MODULE));
         }
+
+        protected override void ConfigureContainerBuilder(ContainerBuilder builder)
+        {
+            builder.RegisterInstance(new Config()).As<IConfig>();
+            base.ConfigureContainerBuilder(builder);
+        }
+
     }
 }

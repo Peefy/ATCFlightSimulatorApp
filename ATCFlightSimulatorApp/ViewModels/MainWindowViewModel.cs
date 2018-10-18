@@ -1,5 +1,7 @@
 ﻿using Prism.Mvvm;
 
+using ATCFlightSimulatorApp.Services;
+
 namespace ATCFlightSimulatorApp.ViewModels
 {
     public class MainWindowViewModel : BindableBase
@@ -11,9 +13,14 @@ namespace ATCFlightSimulatorApp.ViewModels
             set { SetProperty(ref _title, value); }
         }
 
-        public MainWindowViewModel()
-        {
+        private IConfig _config;
+        private IATCFlightClient _client;
 
+        public MainWindowViewModel(IConfig config, IATCFlightClient client)
+        {
+            _config = config;
+            _client = client;
+            Title = _config.GetFileName();
         }
     }
 }
