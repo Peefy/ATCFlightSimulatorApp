@@ -1,7 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
+
 using Newtonsoft.Json;
+
+using ATCFlightSimulatorApp.Utils.JsonModels;
 
 namespace ATCFlightSimulatorApp.Utils
 {
@@ -66,13 +69,16 @@ namespace ATCFlightSimulatorApp.Utils
                 return new JsonFileConfig();
             }
         }
+        
+        [JsonProperty("communicationConfig")]
+        public CommunicationConfig CommunicationConfig { get; set; }
 
         /// <summary>
         /// 无参构造函数
         /// </summary>
         public JsonFileConfig()
         {
-            
+            CommunicationConfig = new CommunicationConfig();
         }
 
         /// <summary>

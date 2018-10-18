@@ -11,6 +11,7 @@ namespace ATCFlightSimulatorApp.Services
     public class ATCFlightClient : IATCFlightClient, IDisposable
     {
         TcpClient _client;
+        NetworkStream _stream;
 
         string _serverIp = "192.168.0.130";
         int _serverPort = 12000;
@@ -31,15 +32,32 @@ namespace ATCFlightSimulatorApp.Services
             
         }
 
+        public void SendTo(byte[] bytes)
+        {
+            _stream.Write(bytes, 0, bytes.Length);
+        }
+
+        public byte[] Recieve()
+        {
+            var data = new byte[256];
+            var rdata = new byte[256];
+            var bytes = _stream.Read(data, 0, data.Length);
+            Array.Copy(rdata, data, bytes);
+            return rdata;
+        }
+
         public bool Connect()
         {
             _client = new TcpClient(_serverIp, _serverPort);
+            _stream = _client.GetStream();
             _isConnect = true;
             return _isConnect;
         }
 
         public bool DisConnect()
         {
+            _stream?.Close();
+            _client?.Close();
             return true;
         }
 

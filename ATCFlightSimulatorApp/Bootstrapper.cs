@@ -29,6 +29,7 @@ namespace ATCFlightSimulatorApp
         protected override void ConfigureContainerBuilder(ContainerBuilder builder)
         {
             builder.RegisterInstance(new Config()).As<IConfig>();
+            builder.RegisterInstance(new ATCFlightClient()).As<IATCFlightClient>();
             base.ConfigureContainerBuilder(builder);
         }
 

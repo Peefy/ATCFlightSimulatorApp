@@ -9,5 +9,6 @@ namespace ATCFlightSimulatorApp.Services
     public interface IConfig
     {
         string GetFileName();
+        string GetAppName();
     }
 }
