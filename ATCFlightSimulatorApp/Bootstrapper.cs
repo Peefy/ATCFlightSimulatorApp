@@ -4,6 +4,8 @@ using Prism.Modularity;
 using Prism.Autofac;
 using Autofac;
 
+using XPlane10DataAdapter;
+
 using ATCFlightSimulatorApp.Views;
 using ATCFlightSimulatorApp.Services;
 
@@ -30,6 +32,7 @@ namespace ATCFlightSimulatorApp
         {
             builder.RegisterInstance(new Config()).As<IConfig>();
             builder.RegisterInstance(new ATCFlightClient()).As<IATCFlightClient>();
+            builder.RegisterInstance(new XPlaneConnect()).As<IXPlaneConnect>();
             base.ConfigureContainerBuilder(builder);
         }
 

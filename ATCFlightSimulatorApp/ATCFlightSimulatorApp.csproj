@@ -130,6 +130,10 @@
       <Project>{eee41317-911c-401e-82f9-cc92a9117bcd}</Project>
       <Name>FlightSimulator.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\XPlane10DataAdapter\XPlane10DataAdapter.csproj">
+      <Project>{b384e7c6-ebf4-47a0-a3ae-f20a157a5b3f}</Project>
+      <Name>XPlane10DataAdapter</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

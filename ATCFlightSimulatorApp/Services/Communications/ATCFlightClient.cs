@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 
 using ATCFlightSimulatorApp.Utils;
+using ATCFlightSimulatorApp.Utils.JsonModels;
 
 namespace ATCFlightSimulatorApp.Services
 {
@@ -12,6 +13,7 @@ namespace ATCFlightSimulatorApp.Services
     {
         TcpClient _client;
         NetworkStream _stream;
+        CommunicationConfig _config;
 
         string _serverIp = "192.168.0.130";
         int _serverPort = 12000;
@@ -19,17 +21,10 @@ namespace ATCFlightSimulatorApp.Services
 
         public ATCFlightClient()
         {
-            
-        }
-
-        public void RecieveData()
-        {
-            
-        }
-
-        public void SendData()
-        {
-            
+            _config = JsonFileConfig.Instance.CommunicationConfig;
+            _serverIp = _config.HostIp;
+            _serverPort = _config.HostPort;
+            //_client = new TcpClient(_serverIp, _serverPort);
         }
 
         public void SendTo(byte[] bytes)
@@ -39,9 +34,9 @@ namespace ATCFlightSimulatorApp.Services
 
         public byte[] Recieve()
         {
-            var data = new byte[256];
-            var rdata = new byte[256];
+            var data = new byte[65535];
             var bytes = _stream.Read(data, 0, data.Length);
+            var rdata = new byte[bytes];
             Array.Copy(rdata, data, bytes);
             return rdata;
         }

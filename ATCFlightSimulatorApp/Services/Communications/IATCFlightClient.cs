@@ -9,8 +9,6 @@ namespace ATCFlightSimulatorApp.Services
     {
         void SendTo(byte[] bytes);
         byte[] Recieve();
-        void SendData();
-        void RecieveData();
         bool Connect();
         bool DisConnect();
     }

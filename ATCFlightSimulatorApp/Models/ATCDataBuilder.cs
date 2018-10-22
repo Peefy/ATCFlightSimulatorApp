@@ -14,12 +14,4 @@ namespace ATCFlightSimulatorApp.Models
         }
     }
 
-    public class FlightSimulatorBuilder
-    {
-        public FlightSimulatorBuilder()
-        {
-
-        }
-    }
-
 }

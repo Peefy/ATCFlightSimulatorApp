@@ -44,7 +44,7 @@ namespace FlightSimulator.Models
         /// </summary>
         public double Longtitude;
         /// <summary>
-        /// 航空器维度
+        /// 航空器纬度
         /// </summary>
         public double Latitude;
         /// <summary>
@@ -148,4 +148,5 @@ namespace FlightSimulator.Models
         /// </summary>
         public int Status;
     }
+
 }

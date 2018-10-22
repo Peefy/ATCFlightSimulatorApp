@@ -41,8 +41,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IXPlaneConnect.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewType.cs" />
+    <Compile Include="WayPointOp.cs" />
     <Compile Include="XPlaneConnect.cs" />
+    <Compile Include="XPlaneConnectTest.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
