@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -7,6 +8,7 @@ using Prism.Mvvm;
 
 using XPlane10DataAdapter;
 
+using ATCFlightSimulatorApp.Models;
 using ATCFlightSimulatorApp.Services;
 
 namespace ATCFlightSimulatorApp.ViewModels
@@ -31,7 +33,6 @@ namespace ATCFlightSimulatorApp.ViewModels
             _client = client;
             _xplane = xplane;
             Title = _config.GetAppName();
-           
         }
     }
 }

@@ -67,6 +67,7 @@
     </Compile>
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Models\ATCDataBuilder.cs" />
+    <Compile Include="Models\FlightSimulatorModelBuilder.cs" />
     <Compile Include="Services\Communications\ATCFlightClient.cs" />
     <Compile Include="Services\Communications\IATCFlightClient.cs" />
     <Compile Include="Services\Config\Config.cs" />
