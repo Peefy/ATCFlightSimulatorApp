@@ -91,7 +91,7 @@ namespace THUFlightDataAdapterApp
 
         static void Main(string[] args)
         {
-            Console.WriteLine("ATC Data Adapter");
+            Console.WriteLine("ATC Data Adapter");      
             BuildTcpUdpNet();
             UdpTask();
             //TcpTask();

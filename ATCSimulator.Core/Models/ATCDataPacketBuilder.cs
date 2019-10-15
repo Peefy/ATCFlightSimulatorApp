@@ -8,6 +8,7 @@ namespace ATCSimulator.Models
     public class ATCDataPacketBuilder
     {
         const ushort HeaderConst = 0xFDFD;
+        const ushort PackageLengthConst = 221;
         const byte FrameTypeConst = 0x03;
         const ushort FlightSimulatorIDConst = 0x0001;
         const int ReservedByteCount = 100;
@@ -20,7 +21,8 @@ namespace ATCSimulator.Models
             {
                 Header = HeaderConst,
                 FrameType = FrameTypeConst,
-                FlightSimulatorID = FlightSimulatorIDConst
+                FlightSimulatorID = FlightSimulatorIDConst,
+                PacketLength = PackageLengthConst
             };
         }
 
@@ -130,16 +132,16 @@ namespace ATCSimulator.Models
         {
             var list = new List<byte>();
             var bytes = BuildCommandBytes();
-            var checkbyte = CalCheckByte(bytes);
+            var checkushort = CalCheckByte(bytes);
             list.AddRange(bytes);
             list.AddRange(new byte[ReservedByteCount]);
-            list.Add(checkbyte);
+            list.AddRange(BitConverter.GetBytes(checkushort));
             return list.ToArray();
         }
 
-        private byte CalCheckByte(byte[] bytes, int startIndex = 2)
+        private ushort CalCheckByte(byte[] bytes, int startIndex = 2)
         {
-            byte check = 0x00;
+            ushort check = 0x0000;
             var n = bytes.Length;
             if (startIndex >= n)
                 return check;
