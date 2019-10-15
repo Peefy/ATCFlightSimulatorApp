@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28010.2016
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.156
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ATCFlightSimulatorApp", "ATCFlightSimulatorApp\ATCFlightSimulatorApp.csproj", "{AE4520A7-2267-4525-95FD-8F979CEE558F}"
 EndProject
@@ -12,6 +12,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XPlane10DataAdapter", "XPlane10DataAdapter\XPlane10DataAdapter.csproj", "{B384E7C6-EBF4-47A0-A3AE-F20A157A5B3F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cessna172DataDriver", "Cessna172DataDriver\Cessna172DataDriver.csproj", "{4E7E1193-592A-4C43-94A6-959F84E7721D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "THUFlightDataAdapterApp", "THUFlightDataAdapterApp\THUFlightDataAdapterApp.csproj", "{8E8B6120-0476-489A-82B5-F771EC7295A9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{4E7E1193-592A-4C43-94A6-959F84E7721D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4E7E1193-592A-4C43-94A6-959F84E7721D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4E7E1193-592A-4C43-94A6-959F84E7721D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E8B6120-0476-489A-82B5-F771EC7295A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E8B6120-0476-489A-82B5-F771EC7295A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E8B6120-0476-489A-82B5-F771EC7295A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E8B6120-0476-489A-82B5-F771EC7295A9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

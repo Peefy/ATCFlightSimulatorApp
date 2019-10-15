@@ -42,13 +42,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\ConnectPacket.cs" />
-    <Compile Include="Models\ReadyPacket.cs" />
-    <Compile Include="Models\RoutePoint.cs" />
-    <Compile Include="Models\RunControlPacket.cs" />
-    <Compile Include="Models\ScenarioPacket.cs" />
-    <Compile Include="Models\TimeTampPacket.cs" />
+    <Compile Include="Models\ATCDataPacket.cs" />
+    <Compile Include="Models\ATCDataPacketBuilder.cs" />
+    <Compile Include="Models\FlightStatusEnum.cs" />
+    <Compile Include="Models\WswModelKind.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Uitl\StructHelper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
