@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Threading;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading.Tasks;
 
 using ATCSimulator.Models;
@@ -41,7 +38,6 @@ namespace THUFlightDataAdapterApp
             {
                 try
                 {
-                    var sendCount = 0;
                     while (true)
                     {
                         //从WswTHUSim接收飞行模拟器姿态和经纬度坐标
@@ -51,12 +47,12 @@ namespace THUFlightDataAdapterApp
                         var length = recieveBytes.Length;
                         if (length == StructHelper.GetStructSize<AngleWithLocation>() && ip == comConfig.SelfIp)
                         {
+                            // 地球坐标系坐标 x y z roll pitch yaw
                             var angleWithLocation = StructHelper.BytesToStruct<AngleWithLocation>(recieveBytes);
                             // 在此处编写处理数据的程序
                             packetBuilder.SetAngles(angleWithLocation.Roll, angleWithLocation.Pitch, angleWithLocation.Yaw);
                             packetBuilder.SetPositions(0, 0, 0);
                             packetBuilder.SetFlightSimulatorKind(WswHelper.GetFlightKindFromIp(ip));
-                            packetBuilder
                             lock (lockobj)
                             {
                                 datas = packetBuilder.BuildCommandTotalBytes();
