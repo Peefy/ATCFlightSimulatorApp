@@ -14,12 +14,12 @@ namespace THUFlightDataAdapterApp.Model
     public struct AngleWithLocation
     {
         /// <summary>
-        /// X坐标(地心坐标系)
+        /// X坐标(地球坐标系)
         /// </summary>
         public double X;
 
         /// <summary>
-        /// Y坐标(地心坐标系)
+        /// Y坐标(地球坐标系)
         /// </summary>
         public double Y;
 

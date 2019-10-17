@@ -32,6 +32,11 @@ namespace THUFlightDataAdapterApp
             //tcpClient.Connect(comConfig.ATCSimulatorIp, comConfig.ATCSimulatorPort);
         }
 
+        static double Rad2Deg(double rad)
+        {
+            return rad / Math.PI * 180.0;
+        }
+
         static void UdpTask()
         {
             Task.Run(() =>
@@ -49,10 +54,20 @@ namespace THUFlightDataAdapterApp
                         {
                             // 地球坐标系坐标 x y z roll pitch yaw
                             var angleWithLocation = StructHelper.BytesToStruct<AngleWithLocation>(recieveBytes);
-                            // 在此处编写处理数据的程序
-                            packetBuilder.SetAngles(angleWithLocation.Roll, angleWithLocation.Pitch, angleWithLocation.Yaw);
-                            packetBuilder.SetPositions(0, 0, 0);
+
+                            var earthRadius = 6378137.0;
+                            var pi = Math.PI;
+                            var e2 = 0.00669437999013;
+                            var lon = Math.Atan2(angleWithLocation.Y, angleWithLocation.X) * 180.0 / pi;
+                            if (lon < 0)
+                                lon = 180 + lon;
+                            var lat = Math.Atan2(angleWithLocation.Z, Math.Sqrt(angleWithLocation.X * angleWithLocation.X + angleWithLocation.Y * angleWithLocation.Y) * (1 - e2 * e2)) * 180.0 / pi;
+                            var height = Math.Sqrt((angleWithLocation.X * angleWithLocation.X + angleWithLocation.Y * angleWithLocation.Y + angleWithLocation.Z * angleWithLocation.Z) / ((1 - e2 * e2) * (1 - e2 * e2))) - earthRadius;
+
+                            packetBuilder.SetAngles(Rad2Deg(angleWithLocation.Roll), Rad2Deg(angleWithLocation.Pitch), Rad2Deg(angleWithLocation.Yaw));
+                            packetBuilder.SetPositions(lon, lat, height);
                             packetBuilder.SetFlightSimulatorKind(WswHelper.GetFlightKindFromIp(ip));
+                            
                             lock (lockobj)
                             {
                                 datas = packetBuilder.BuildCommandTotalBytes();
@@ -102,3 +117,7 @@ namespace THUFlightDataAdapterApp
         }
     }
 }
+
+
+
+
