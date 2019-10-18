@@ -93,28 +93,28 @@ namespace ATCSimulator.Models
 
         public ATCDataPacketBuilder SetFlightSimulatorKind(WswModelKind kind)
         {
+            byte[] kindBytes = new byte[4];
+            byte[] numBytes = new byte[6];
             switch (kind)
             {
                 case WswModelKind.EH101:
-                    _packet.FlightKind = Convert.ToUInt32('E' << 24 + 'H' << 16 + '1' << 8 + '0');
-                    _packet.FlightRegisterNumber1 = Convert.ToUInt16('E' << 8 + 'H');
-                    _packet.FlightRegisterNumber2 = Convert.ToUInt16('1' << 8 + '0');
-                    _packet.FlightRegisterNumber3 = Convert.ToUInt16('0' << 8 + '1');
+                    kindBytes = System.Text.Encoding.ASCII.GetBytes("EH10");
+                    numBytes = System.Text.Encoding.ASCII.GetBytes("EH1001");
                     break;
                 case WswModelKind.CJ6:
-                    _packet.FlightKind = Convert.ToUInt32('C' << 24 + 'J' << 16 + '6' << 8 + '0');
-                    _packet.FlightRegisterNumber1 = Convert.ToUInt16('C' << 8 + 'J');
-                    _packet.FlightRegisterNumber2 = Convert.ToUInt16('6' << 8 + '-');
-                    _packet.FlightRegisterNumber3 = Convert.ToUInt16('0' << 8 + '1');
+                    kindBytes = System.Text.Encoding.ASCII.GetBytes("CJ60");
+                    numBytes = System.Text.Encoding.ASCII.GetBytes("CJ6-01");
                     break;
                 case WswModelKind.F18:
-                    _packet.FlightKind = Convert.ToUInt32('F' << 24 + '1' << 16 + '8' << 8 + 'H');
-                    _packet.FlightRegisterNumber1 = Convert.ToUInt16('F' << 8 + '1');
-                    _packet.FlightRegisterNumber2 = Convert.ToUInt16('8' << 8 + 'H');
-                    _packet.FlightRegisterNumber3 = Convert.ToUInt16('0' << 8 + '1');
+                    kindBytes = System.Text.Encoding.ASCII.GetBytes("F18H");
+                    numBytes = System.Text.Encoding.ASCII.GetBytes("F18H01");
                     break;
                 default: break;
             }
+            _packet.FlightKind = Convert.ToUInt32((kindBytes[0] << 24) + (kindBytes[1] << 16) + (kindBytes[2] << 8) + kindBytes[3]);
+            _packet.FlightRegisterNumber1 = Convert.ToUInt16((numBytes[0] << 8) + numBytes[1]);
+            _packet.FlightRegisterNumber2 = Convert.ToUInt16((numBytes[2] << 8) + numBytes[3]);
+            _packet.FlightRegisterNumber3 = Convert.ToUInt16((numBytes[4] << 8) + numBytes[5]);
             return this;
         }
 

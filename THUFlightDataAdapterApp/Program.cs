@@ -9,6 +9,7 @@ using ATCSimulator.Models;
 using THUFlightDataAdapterApp.Model;
 using THUFlightDataAdapterApp.Util;
 using THUFlightDataAdapterApp.Util.JsonModels;
+using System.Runtime.InteropServices;
 
 namespace THUFlightDataAdapterApp
 {
@@ -21,6 +22,7 @@ namespace THUFlightDataAdapterApp
         static ATCDataPacketBuilder packetBuilder;
         static byte[] datas = new byte[1];
         const int sendInterval = 30;
+        static bool isTest = true;
 
         static void BuildTcpUdpNet()
         {
@@ -29,7 +31,27 @@ namespace THUFlightDataAdapterApp
             comConfig = JsonFileConfig.Instance.ComConfig;
             udpClient = new UdpClient(comConfig.SelfPort);
             tcpClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            //tcpClient.Connect(comConfig.ATCSimulatorIp, comConfig.ATCSimulatorPort);
+            try
+            {
+                tcpClient.Connect("183.173.81.17", comConfig.ATCSimulatorPort);
+            }
+        
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+
+        private static void CloseTcpUdpNet()
+        {
+            if (udpClient != null)
+            {
+                udpClient.Close();
+            }
+            if (tcpClient != null)
+            {
+                tcpClient.Disconnect(false);
+            }
         }
 
         static double Rad2Deg(double rad)
@@ -55,18 +77,11 @@ namespace THUFlightDataAdapterApp
                             // 地球坐标系坐标 x y z roll pitch yaw
                             var angleWithLocation = StructHelper.BytesToStruct<AngleWithLocation>(recieveBytes);
 
-                            var earthRadius = 6378137.0;
-                            var pi = Math.PI;
-                            var e2 = 0.00669437999013;
-                            var lon = Math.Atan2(angleWithLocation.Y, angleWithLocation.X) * 180.0 / pi;
-                            if (lon < 0)
-                                lon = 180 + lon;
-                            var lat = Math.Atan2(angleWithLocation.Z, Math.Sqrt(angleWithLocation.X * angleWithLocation.X + angleWithLocation.Y * angleWithLocation.Y) * (1 - e2 * e2)) * 180.0 / pi;
-                            var height = Math.Sqrt((angleWithLocation.X * angleWithLocation.X + angleWithLocation.Y * angleWithLocation.Y + angleWithLocation.Z * angleWithLocation.Z) / ((1 - e2 * e2) * (1 - e2 * e2))) - earthRadius;
-
-                            packetBuilder.SetAngles(Rad2Deg(angleWithLocation.Roll), Rad2Deg(angleWithLocation.Pitch), Rad2Deg(angleWithLocation.Yaw));
-                            packetBuilder.SetPositions(lon, lat, height);
-                            packetBuilder.SetFlightSimulatorKind(WswHelper.GetFlightKindFromIp(ip));
+                            packetBuilder.SetAngles(Rad2Deg(angleWithLocation.Roll), Rad2Deg(angleWithLocation.Pitch), Rad2Deg(angleWithLocation.Yaw))
+                                .SetPositions(PositionHelper.XYZToLon(angleWithLocation.X, angleWithLocation.Y, angleWithLocation.Z),
+                                        PositionHelper.XYZToLat(angleWithLocation.X, angleWithLocation.Y, angleWithLocation.Z),
+                                        PositionHelper.XYZToHeight(angleWithLocation.X, angleWithLocation.Y, angleWithLocation.Z))
+                                .SetFlightSimulatorKind(WswHelper.GetFlightKindFromIp(ip));
                             
                             lock (lockobj)
                             {
@@ -92,7 +107,20 @@ namespace THUFlightDataAdapterApp
                     {
                         lock (lockobj)
                         {
-                            tcpClient.Send(datas);
+                            if (isTest == true)
+                            {
+                                tcpClient.Send(new ATCDataPacketBuilder()
+                                    .SetAngles(10, 20, 30)
+                                    .SetFlightSimulatorKind(WswModelKind.CJ6)
+                                    .SetPositions(PositionHelper.XYZToLon(WswHelper.TestDataX, WswHelper.TestDataY, WswHelper.TestDataZ),
+                                        PositionHelper.XYZToLat(WswHelper.TestDataX, WswHelper.TestDataY, WswHelper.TestDataZ),
+                                        PositionHelper.XYZToHeight(WswHelper.TestDataX, WswHelper.TestDataY, WswHelper.TestDataZ))
+                                    .BuildCommandTotalBytes());
+                            }
+                            else
+                            {
+                                tcpClient.Send(datas);
+                            }
                         }
                         Thread.Sleep(sendInterval);
                     }
@@ -104,17 +132,37 @@ namespace THUFlightDataAdapterApp
             });
         }
 
+        public delegate bool ControlCtrlDelegate(int CtrlType);
+        [DllImport("kernel32.dll")]
+        private static extern bool SetConsoleCtrlHandler(ControlCtrlDelegate HandlerRoutine, bool Add);
+        private static ControlCtrlDelegate cancelHandler = new ControlCtrlDelegate(HandlerRoutine);
+
+        public static bool HandlerRoutine(int CtrlType)
+        {
+            switch (CtrlType)
+            {
+                case 0:
+                    CloseTcpUdpNet();
+                    break;
+                case 2:
+                    CloseTcpUdpNet();
+                    break;
+            }
+            return false;
+        }
+
         static void Main(string[] args)
         {
-            Console.WriteLine("ATC Data Adapter");      
+            Console.WriteLine("ATC Data Adapter");
+            SetConsoleCtrlHandler(cancelHandler, true);
             BuildTcpUdpNet();
             UdpTask();
-            //TcpTask();
-            Console.WriteLine("Press three to exit");
+            TcpTask();
+            Console.WriteLine("Press to exit");
             Console.ReadLine();
-            Console.ReadLine();
-            Console.ReadLine();
+            CloseTcpUdpNet();
         }
+
     }
 }
 
