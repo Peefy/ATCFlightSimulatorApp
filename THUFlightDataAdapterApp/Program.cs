@@ -33,7 +33,7 @@ namespace THUFlightDataAdapterApp
             tcpClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             try
             {
-                tcpClient.Connect("183.173.81.17", comConfig.ATCSimulatorPort);
+                tcpClient.Connect(comConfig.ATCSimulatorIp, comConfig.ATCSimulatorPort);
             }
         
             catch (Exception ex)
