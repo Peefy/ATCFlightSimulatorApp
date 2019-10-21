@@ -21,7 +21,7 @@ namespace THUFlightDataAdapterApp
         static ComConfig comConfig;
         static ATCDataPacketBuilder packetBuilder;
         static byte[] datas = new byte[1];
-        const int sendInterval = 30;
+        const int sendInterval = 27;
         static bool isTest = true;
 
         static void BuildTcpUdpNet()
@@ -34,11 +34,13 @@ namespace THUFlightDataAdapterApp
             try
             {
                 tcpClient.Connect(comConfig.ATCSimulatorIp, comConfig.ATCSimulatorPort);
+                Console.WriteLine("Connect server success!");
             }
         
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                Console.WriteLine("Connect server failure! The reason as follows");
+                Console.WriteLine(ex.Message.ToString());
             }
         }
 
@@ -67,7 +69,7 @@ namespace THUFlightDataAdapterApp
                 {
                     while (true)
                     {
-                        //从WswTHUSim接收飞行模拟器姿态和经纬度坐标
+                        // 从WswTHUSim接收飞行模拟器姿态和经纬度坐标
                         var ipEndPoint = new IPEndPoint(IPAddress.Any, 0);
                         var recieveBytes = udpClient.Receive(ref ipEndPoint);
                         var ip = ipEndPoint.ToString();
@@ -103,26 +105,90 @@ namespace THUFlightDataAdapterApp
             {
                 try
                 {
+                    uint count = 0;
                     while (true)
                     {
                         lock (lockobj)
                         {
                             if (isTest == true)
-                            {
-                                tcpClient.Send(new ATCDataPacketBuilder()
-                                    .SetAngles(10, 20, 30)
-                                    .SetFlightSimulatorKind(WswModelKind.CJ6)
-                                    .SetPositions(PositionHelper.XYZToLon(WswHelper.TestDataX, WswHelper.TestDataY, WswHelper.TestDataZ),
-                                        PositionHelper.XYZToLat(WswHelper.TestDataX, WswHelper.TestDataY, WswHelper.TestDataZ),
-                                        PositionHelper.XYZToHeight(WswHelper.TestDataX, WswHelper.TestDataY, WswHelper.TestDataZ))
-                                    .BuildCommandTotalBytes());
+                            {                     
+                                if (count >= 100)
+                                {
+                                    tcpClient.Send(new ATCDataPacketBuilder()
+                                        .SetCountAndTime(count, DateTime.UtcNow)
+                                        .SetStatus(false, false, false, 0)
+                                        .SetAngles(0, 0, 0)
+                                        .SetFlightSimulatorKind(WswModelKind.CJ6)
+                                        .SetPositions(PositionHelper.XYZToLon(WswHelper.TestDataX, WswHelper.TestDataY, WswHelper.TestDataZ),
+                                            PositionHelper.XYZToLat(WswHelper.TestDataX, WswHelper.TestDataY, WswHelper.TestDataZ),
+                                            PositionHelper.XYZToHeight(WswHelper.TestDataX, WswHelper.TestDataY, WswHelper.TestDataZ))
+                                        .BuildCommandTotalBytes());
+                                    Thread.Sleep(sendInterval / 3);
+
+                                    tcpClient.Send(new ATCDataPacketBuilder()
+                                        .SetCountAndTime(count, DateTime.UtcNow)
+                                        .SetAngles(0, 0, 0)
+                                        .SetFlightSimulatorKind(WswModelKind.F18)
+                                        .SetPositions(PositionHelper.XYZToLon(WswHelper.TestFlightDataX, WswHelper.TestFlightDataY, WswHelper.TestFlightDataZ),
+                                            PositionHelper.XYZToLat(WswHelper.TestFlightDataX, WswHelper.TestFlightDataY, WswHelper.TestFlightDataZ),
+                                            PositionHelper.XYZToHeight(WswHelper.TestFlightDataX, WswHelper.TestFlightDataY, WswHelper.TestFlightDataZ))
+                                        .BuildCommandTotalBytes());
+                                    Thread.Sleep(sendInterval / 3);
+
+                                    tcpClient.Send(new ATCDataPacketBuilder()
+                                        .SetCountAndTime(count, DateTime.UtcNow)
+                                        .SetStatus(false, false, false, 0)
+                                        .SetAngles(0, 0, 0)
+                                        .SetFlightSimulatorKind(WswModelKind.EH101)
+                                        .SetPositions(PositionHelper.XYZToLon(WswHelper.TestFlight2DataX, WswHelper.TestFlight2DataY, WswHelper.TestFlight2DataZ),
+                                            PositionHelper.XYZToLat(WswHelper.TestFlight2DataX, WswHelper.TestFlight2DataY, WswHelper.TestFlight2DataZ),
+                                            PositionHelper.XYZToHeight(WswHelper.TestFlight2DataX, WswHelper.TestFlight2DataY, WswHelper.TestFlight2DataZ))
+                                        .BuildCommandTotalBytes());
+                                    Thread.Sleep(sendInterval / 3);
+
+                                }
+                                else
+                                {
+                                    tcpClient.Send(new ATCDataPacketBuilder()
+                                        .SetCountAndTime(count, DateTime.UtcNow)
+                                        .SetStatus(false, true, true, 50)
+                                        .SetAngles(-10, 20, 30)
+                                        .SetFlightSimulatorKind(WswModelKind.CJ6)
+                                        .SetPositions(PositionHelper.XYZToLon(WswHelper.TestDataX, WswHelper.TestDataY, WswHelper.TestDataZ),
+                                            PositionHelper.XYZToLat(WswHelper.TestDataX, WswHelper.TestDataY, WswHelper.TestDataZ),
+                                            PositionHelper.XYZToHeight(WswHelper.TestDataX, WswHelper.TestDataY, WswHelper.TestDataZ))
+                                        .BuildCommandTotalBytes());
+                                    Thread.Sleep(sendInterval / 3);
+
+                                    tcpClient.Send(new ATCDataPacketBuilder()
+                                        .SetCountAndTime(count, DateTime.UtcNow)
+                                        .SetStatus(true, false, true, 75)
+                                        .SetAngles(30, -10, 20)
+                                        .SetFlightSimulatorKind(WswModelKind.F18)
+                                        .SetPositions(PositionHelper.XYZToLon(WswHelper.TestFlightDataX, WswHelper.TestFlightDataY, WswHelper.TestFlightDataZ),
+                                            PositionHelper.XYZToLat(WswHelper.TestFlightDataX, WswHelper.TestFlightDataY, WswHelper.TestFlightDataZ),
+                                            PositionHelper.XYZToHeight(WswHelper.TestFlightDataX, WswHelper.TestFlightDataY, WswHelper.TestFlightDataZ))
+                                        .BuildCommandTotalBytes());
+                                    Thread.Sleep(sendInterval / 3);
+
+                                    tcpClient.Send(new ATCDataPacketBuilder()
+                                        .SetCountAndTime(count, DateTime.UtcNow)
+                                        .SetStatus(true, true, true, 100)
+                                        .SetAngles(30, 40, -10)
+                                        .SetFlightSimulatorKind(WswModelKind.EH101)
+                                        .SetPositions(PositionHelper.XYZToLon(WswHelper.TestFlight2DataX, WswHelper.TestFlight2DataY, WswHelper.TestFlight2DataZ),
+                                            PositionHelper.XYZToLat(WswHelper.TestFlight2DataX, WswHelper.TestFlight2DataY, WswHelper.TestFlight2DataZ),
+                                            PositionHelper.XYZToHeight(WswHelper.TestFlight2DataX, WswHelper.TestFlight2DataY, WswHelper.TestFlight2DataZ))
+                                        .BuildCommandTotalBytes());
+                                    Thread.Sleep(sendInterval / 3);
+                                }
+                                count++;
                             }
                             else
                             {
                                 tcpClient.Send(datas);
                             }
-                        }
-                        Thread.Sleep(sendInterval);
+                        }               
                     }
                 }
                 catch (Exception ex)

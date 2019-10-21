@@ -36,6 +36,14 @@ namespace THUFlightDataAdapterApp.Util
         public const float TestDataY = 4365170.829541899263859f;
         public const float TestDataZ = 4104669.64909399114549f;
 
+        public const float TestFlightDataX = -2185240.567762811668217f;
+        public const float TestFlightDataY = 4364298.105915346182883f;
+        public const float TestFlightDataZ = 4105952.615580440033227f;
+
+        public static float TestFlight2DataX => (TestDataX + TestFlightDataX) / 2.0f;
+        public static float TestFlight2DataY => (TestDataY + TestFlightDataY) / 2.0f;
+        public static float TestFlight2DataZ => (TestDataZ + TestFlightDataZ) / 2.0f;
+
     }
 
     public class PositionHelper

@@ -148,19 +148,35 @@ namespace ATCSimulator.Models
         /// </summary>
         public byte LandingGear;
         /// <summary>
-        /// 发动机运行状态和故障 33
+        /// 1号发动机节风门 0~200 0关闭，100全开，101-200超功率运行或加力运行，200加力全开  33
+        /// </summary>
+        public byte FanDoor1;
+        /// <summary>
+        /// 2号发动机节风门0~200 0关闭，100全开，101-200超功率运行或加力运行，200加力全开  34
+        /// </summary>
+        public byte FanDoor2;
+        /// <summary>
+        /// 3号发动机节风门0~200 0关闭，100全开，101-200超功率运行或加力运行，200加力全开  35
+        /// </summary>
+        public byte FanDoor3;
+        /// <summary>
+        /// 4号发动机节风门0~200 0关闭，100全开，101-200超功率运行或加力运行，200加力全开  36
+        /// </summary>
+        public byte FanDoor4;
+        /// <summary>
+        /// 发动机运行状态和故障 37
         /// </summary>
         public byte EngineStatus;
         /// <summary>
-        /// 其他故障1  34
+        /// 其他故障1  38
         /// </summary>
         public byte OtherStatus1;
         /// <summary>
-        /// 其他故障2  35
+        /// 其他故障2  39
         /// </summary>
         public byte OtherStatus2;
         /// <summary>
-        /// 灯光状态   36
+        /// 灯光状态   40
         /// </summary>
         public byte LightStatus;
     }
