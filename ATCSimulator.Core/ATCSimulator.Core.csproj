@@ -46,6 +46,8 @@
     <Compile Include="Models\ATCDataPacketBuilder.cs" />
     <Compile Include="Models\FlightStatusEnum.cs" />
     <Compile Include="Models\WswModelKind.cs" />
+    <Compile Include="Models\ZBAAStandPosition.cs" />
+    <Compile Include="Models\ZBAAStandPositionFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Uitl\StructHelper.cs" />
   </ItemGroup>

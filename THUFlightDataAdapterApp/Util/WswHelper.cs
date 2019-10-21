@@ -44,6 +44,9 @@ namespace THUFlightDataAdapterApp.Util
         public static float TestFlight2DataY => (TestDataY + TestFlightDataY) / 2.0f;
         public static float TestFlight2DataZ => (TestDataZ + TestFlightDataZ) / 2.0f;
 
+        public const float Lon = 0.0f;
+        public const float Lat = 0.0f;
+
     }
 
     public class PositionHelper

@@ -152,10 +152,10 @@ namespace ATCSimulator.Models
                     break;
                 default: break;
             }
-            _packet.FlightKind = Convert.ToUInt32((kindBytes[0] << 24) + (kindBytes[1] << 16) + (kindBytes[2] << 8) + kindBytes[3]);
-            _packet.FlightRegisterNumber1 = Convert.ToUInt16((numBytes[0] << 8) + numBytes[1]);
-            _packet.FlightRegisterNumber2 = Convert.ToUInt16((numBytes[2] << 8) + numBytes[3]);
-            _packet.FlightRegisterNumber3 = Convert.ToUInt16((numBytes[4] << 8) + numBytes[5]);
+            _packet.FlightKind = Convert.ToUInt32((kindBytes[3] << 24) + (kindBytes[2] << 16) + (kindBytes[1] << 8) + kindBytes[0]);
+            _packet.FlightRegisterNumber1 = Convert.ToUInt16((numBytes[1] << 8) + numBytes[0]);
+            _packet.FlightRegisterNumber2 = Convert.ToUInt16((numBytes[3] << 8) + numBytes[2]);
+            _packet.FlightRegisterNumber3 = Convert.ToUInt16((numBytes[5] << 8) + numBytes[4]);
             return this;
         }
 

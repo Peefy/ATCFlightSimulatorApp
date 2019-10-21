@@ -3,13 +3,15 @@ using System.Threading;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 
 using ATCSimulator.Models;
 
 using THUFlightDataAdapterApp.Model;
 using THUFlightDataAdapterApp.Util;
 using THUFlightDataAdapterApp.Util.JsonModels;
-using System.Runtime.InteropServices;
+
+using static THUFlightDataAdapterApp.Util.MathUtil;
 
 namespace THUFlightDataAdapterApp
 {
@@ -54,11 +56,6 @@ namespace THUFlightDataAdapterApp
             {
                 tcpClient.Disconnect(false);
             }
-        }
-
-        static double Rad2Deg(double rad)
-        {
-            return rad / Math.PI * 180.0;
         }
 
         static void UdpTask()
@@ -106,79 +103,71 @@ namespace THUFlightDataAdapterApp
                 try
                 {
                     uint count = 0;
+                    var stand806 = ZBAAStandPositionFactory.Get("806");
+                    var stand808 = ZBAAStandPositionFactory.Get("808");
+                    var stand810 = ZBAAStandPositionFactory.Get("810");
                     while (true)
                     {
                         lock (lockobj)
                         {
                             if (isTest == true)
                             {                     
-                                if (count >= 100)
+                                if ((count / 667) % 2 == 0)
                                 {
                                     tcpClient.Send(new ATCDataPacketBuilder()
                                         .SetCountAndTime(count, DateTime.UtcNow)
                                         .SetStatus(false, false, false, 0)
-                                        .SetAngles(0, 0, 0)
+                                        .SetAngles(0, 0, stand806.InitialHeading)
                                         .SetFlightSimulatorKind(WswModelKind.CJ6)
-                                        .SetPositions(PositionHelper.XYZToLon(WswHelper.TestDataX, WswHelper.TestDataY, WswHelper.TestDataZ),
-                                            PositionHelper.XYZToLat(WswHelper.TestDataX, WswHelper.TestDataY, WswHelper.TestDataZ),
-                                            PositionHelper.XYZToHeight(WswHelper.TestDataX, WswHelper.TestDataY, WswHelper.TestDataZ))
-                                        .BuildCommandTotalBytes());
-                                    Thread.Sleep(sendInterval / 3);
-
-                                    tcpClient.Send(new ATCDataPacketBuilder()
-                                        .SetCountAndTime(count, DateTime.UtcNow)
-                                        .SetAngles(0, 0, 0)
-                                        .SetFlightSimulatorKind(WswModelKind.F18)
-                                        .SetPositions(PositionHelper.XYZToLon(WswHelper.TestFlightDataX, WswHelper.TestFlightDataY, WswHelper.TestFlightDataZ),
-                                            PositionHelper.XYZToLat(WswHelper.TestFlightDataX, WswHelper.TestFlightDataY, WswHelper.TestFlightDataZ),
-                                            PositionHelper.XYZToHeight(WswHelper.TestFlightDataX, WswHelper.TestFlightDataY, WswHelper.TestFlightDataZ))
+                                        .SetPositions(stand806.Lontitude, stand806.Latitude, stand806.InitialAltitude)
                                         .BuildCommandTotalBytes());
                                     Thread.Sleep(sendInterval / 3);
 
                                     tcpClient.Send(new ATCDataPacketBuilder()
                                         .SetCountAndTime(count, DateTime.UtcNow)
                                         .SetStatus(false, false, false, 0)
-                                        .SetAngles(0, 0, 0)
+                                        .SetAngles(0, 0, stand808.InitialHeading)
+                                        .SetFlightSimulatorKind(WswModelKind.F18)
+                                        .SetPositions(stand808.Lontitude, stand808.Latitude, stand808.InitialAltitude)                                    
+                                        .BuildCommandTotalBytes());
+                                    Thread.Sleep(sendInterval / 3);
+
+                                    tcpClient.Send(new ATCDataPacketBuilder()
+                                        .SetCountAndTime(count, DateTime.UtcNow)
+                                        .SetStatus(false, false, false, 0)
+                                        .SetAngles(0, 0, stand810.InitialHeading)
                                         .SetFlightSimulatorKind(WswModelKind.EH101)
-                                        .SetPositions(PositionHelper.XYZToLon(WswHelper.TestFlight2DataX, WswHelper.TestFlight2DataY, WswHelper.TestFlight2DataZ),
-                                            PositionHelper.XYZToLat(WswHelper.TestFlight2DataX, WswHelper.TestFlight2DataY, WswHelper.TestFlight2DataZ),
-                                            PositionHelper.XYZToHeight(WswHelper.TestFlight2DataX, WswHelper.TestFlight2DataY, WswHelper.TestFlight2DataZ))
+                                        .SetPositions(stand810.Lontitude, stand810.Latitude, stand810.InitialAltitude)
                                         .BuildCommandTotalBytes());
                                     Thread.Sleep(sendInterval / 3);
 
                                 }
-                                else
+                                else if ((count / 667) % 2 == 1)
                                 {
                                     tcpClient.Send(new ATCDataPacketBuilder()
                                         .SetCountAndTime(count, DateTime.UtcNow)
-                                        .SetStatus(false, true, true, 50)
-                                        .SetAngles(-10, 20, 30)
+                                        .SetStatus(true, true, true, 50)
+                                        .SetAngles(-10, 20, stand806.InitialHeading)
                                         .SetFlightSimulatorKind(WswModelKind.CJ6)
-                                        .SetPositions(PositionHelper.XYZToLon(WswHelper.TestDataX, WswHelper.TestDataY, WswHelper.TestDataZ),
-                                            PositionHelper.XYZToLat(WswHelper.TestDataX, WswHelper.TestDataY, WswHelper.TestDataZ),
-                                            PositionHelper.XYZToHeight(WswHelper.TestDataX, WswHelper.TestDataY, WswHelper.TestDataZ))
+                                        .SetPositions(stand806.Lontitude, stand806.Latitude, stand806.InitialAltitude)
                                         .BuildCommandTotalBytes());
                                     Thread.Sleep(sendInterval / 3);
 
                                     tcpClient.Send(new ATCDataPacketBuilder()
                                         .SetCountAndTime(count, DateTime.UtcNow)
-                                        .SetStatus(true, false, true, 75)
-                                        .SetAngles(30, -10, 20)
+                                        .SetStatus(true, true, true, 75)
+                                        .SetAngles(30, -10, stand808.InitialHeading)
                                         .SetFlightSimulatorKind(WswModelKind.F18)
-                                        .SetPositions(PositionHelper.XYZToLon(WswHelper.TestFlightDataX, WswHelper.TestFlightDataY, WswHelper.TestFlightDataZ),
-                                            PositionHelper.XYZToLat(WswHelper.TestFlightDataX, WswHelper.TestFlightDataY, WswHelper.TestFlightDataZ),
-                                            PositionHelper.XYZToHeight(WswHelper.TestFlightDataX, WswHelper.TestFlightDataY, WswHelper.TestFlightDataZ))
+                                        .SetPositions(stand808.Lontitude, stand808.Latitude, stand808.InitialAltitude)
                                         .BuildCommandTotalBytes());
                                     Thread.Sleep(sendInterval / 3);
 
                                     tcpClient.Send(new ATCDataPacketBuilder()
                                         .SetCountAndTime(count, DateTime.UtcNow)
                                         .SetStatus(true, true, true, 100)
-                                        .SetAngles(30, 40, -10)
+                                        .SetAngles(30, 40, stand810.InitialHeading)
                                         .SetFlightSimulatorKind(WswModelKind.EH101)
-                                        .SetPositions(PositionHelper.XYZToLon(WswHelper.TestFlight2DataX, WswHelper.TestFlight2DataY, WswHelper.TestFlight2DataZ),
-                                            PositionHelper.XYZToLat(WswHelper.TestFlight2DataX, WswHelper.TestFlight2DataY, WswHelper.TestFlight2DataZ),
-                                            PositionHelper.XYZToHeight(WswHelper.TestFlight2DataX, WswHelper.TestFlight2DataY, WswHelper.TestFlight2DataZ))
+                                        .SetPositions(stand810.Lontitude, stand810.Latitude, stand810.InitialAltitude)
                                         .BuildCommandTotalBytes());
                                     Thread.Sleep(sendInterval / 3);
                                 }
@@ -201,7 +190,7 @@ namespace THUFlightDataAdapterApp
         public delegate bool ControlCtrlDelegate(int CtrlType);
         [DllImport("kernel32.dll")]
         private static extern bool SetConsoleCtrlHandler(ControlCtrlDelegate HandlerRoutine, bool Add);
-        private static ControlCtrlDelegate cancelHandler = new ControlCtrlDelegate(HandlerRoutine);
+        private static readonly ControlCtrlDelegate cancelHandler = new ControlCtrlDelegate(HandlerRoutine);
 
         public static bool HandlerRoutine(int CtrlType)
         {
@@ -219,7 +208,7 @@ namespace THUFlightDataAdapterApp
 
         static void Main(string[] args)
         {
-            Console.WriteLine("ATC Data Adapter");
+            Console.WriteLine("THU ATC Data Adapter");
             SetConsoleCtrlHandler(cancelHandler, true);
             BuildTcpUdpNet();
             UdpTask();

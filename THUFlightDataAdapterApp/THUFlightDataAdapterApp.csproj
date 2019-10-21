@@ -50,6 +50,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util\JsonFileConfig.cs" />
     <Compile Include="Util\JsonModels\ComConfig.cs" />
+    <Compile Include="Util\MathUtil.cs" />
     <Compile Include="Util\StructHelper.cs" />
     <Compile Include="Util\WswHelper.cs" />
   </ItemGroup>
