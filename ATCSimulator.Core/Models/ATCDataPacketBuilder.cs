@@ -180,6 +180,12 @@ namespace ATCSimulator.Models
             return list.ToArray();
         }
 
+        /// <summary>
+        /// 计算数据包和校验
+        /// </summary>
+        /// <param name="bytes"></param>
+        /// <param name="startIndex"></param>
+        /// <returns></returns>
         private ushort CalCheckByte(byte[] bytes, int startIndex = 2)
         {
             ushort check = 0x0000;

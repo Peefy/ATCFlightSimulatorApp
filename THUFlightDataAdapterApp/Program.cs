@@ -12,6 +12,7 @@ using THUFlightDataAdapterApp.Util;
 using THUFlightDataAdapterApp.Util.JsonModels;
 
 using static THUFlightDataAdapterApp.Util.MathUtil;
+using System.Diagnostics;
 
 namespace THUFlightDataAdapterApp
 {
@@ -22,9 +23,13 @@ namespace THUFlightDataAdapterApp
         static Socket tcpClient;
         static ComConfig comConfig;
         static ATCDataPacketBuilder packetBuilder;
-        static byte[] datas = new byte[1];
         const int sendInterval = 27;
-        static bool isTest = true;
+        static readonly bool isTest = false;
+        static readonly bool isUseTCP = false;
+        static bool isConnectTcp = false;
+        static bool isRevcUdp = false;
+        static bool isTcpError = false;
+        static bool isUdpError = false;
 
         static void BuildTcpUdpNet()
         {
@@ -35,10 +40,13 @@ namespace THUFlightDataAdapterApp
             tcpClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             try
             {
-                tcpClient.Connect(comConfig.ATCSimulatorIp, comConfig.ATCSimulatorPort);
-                Console.WriteLine("Connect server success!");
-            }
-        
+                if (isUseTCP == true)
+                {
+                    tcpClient.Connect(comConfig.ATCSimulatorIp, comConfig.ATCSimulatorPort);
+                    Console.WriteLine("Connect server success!");
+                    isConnectTcp = true;
+                }
+            }   
             catch (Exception ex)
             {
                 Console.WriteLine("Connect server failure! The reason as follows");
@@ -52,7 +60,7 @@ namespace THUFlightDataAdapterApp
             {
                 udpClient.Close();
             }
-            if (tcpClient != null)
+            if (tcpClient != null && isUseTCP == true)
             {
                 tcpClient.Disconnect(false);
             }
@@ -69,29 +77,34 @@ namespace THUFlightDataAdapterApp
                         // 从WswTHUSim接收飞行模拟器姿态和经纬度坐标
                         var ipEndPoint = new IPEndPoint(IPAddress.Any, 0);
                         var recieveBytes = udpClient.Receive(ref ipEndPoint);
-                        var ip = ipEndPoint.ToString();
+                        var ip = ipEndPoint.Address.ToString();
                         var length = recieveBytes.Length;
-                        if (length == StructHelper.GetStructSize<AngleWithLocation>() && ip == comConfig.SelfIp)
+                        isRevcUdp = true;
+                        if (length == StructHelper.GetStructSize<AngleWithLocation>() && ip.StartsWith(comConfig.SelfIp) == true)
                         {
                             // 地球坐标系坐标 x y z roll pitch yaw
                             var angleWithLocation = StructHelper.BytesToStruct<AngleWithLocation>(recieveBytes);
-
-                            packetBuilder.SetAngles(Rad2Deg(angleWithLocation.Roll), Rad2Deg(angleWithLocation.Pitch), Rad2Deg(angleWithLocation.Yaw))
-                                .SetPositions(PositionHelper.XYZToLon(angleWithLocation.X, angleWithLocation.Y, angleWithLocation.Z),
-                                        PositionHelper.XYZToLat(angleWithLocation.X, angleWithLocation.Y, angleWithLocation.Z),
-                                        PositionHelper.XYZToHeight(angleWithLocation.X, angleWithLocation.Y, angleWithLocation.Z))
-                                .SetFlightSimulatorKind(WswHelper.GetFlightKindFromIp(ip));
-                            
+                            var lon = PositionHelper.XYZToLon(angleWithLocation.X, angleWithLocation.Y, angleWithLocation.Z);
+                            var lat = PositionHelper.XYZToLat(angleWithLocation.X, angleWithLocation.Y, angleWithLocation.Z);
+                            var height = PositionHelper.XYZToHeight(angleWithLocation.X, angleWithLocation.Y, angleWithLocation.Z);
+                            var rolldeg = Rad2Deg(angleWithLocation.Roll);
+                            var pitchdeg = Rad2Deg(angleWithLocation.Pitch);
+                            var yawdeg = Rad2Deg(angleWithLocation.Yaw);
+                            var kind = WswHelper.GetFlightKindFromIp(ip);
                             lock (lockobj)
                             {
-                                datas = packetBuilder.BuildCommandTotalBytes();
+                                packetBuilder.SetAngles(rolldeg, pitchdeg, yawdeg)
+                                    .SetPositions(lon, lat, height)
+                                    .SetFlightSimulatorKind(kind);
                             }
                         }
                     }
                 }
                 catch (Exception ex)
                 {
+                    Console.WriteLine("udp error as follows:");
                     Console.WriteLine(ex.ToString());
+                    isUdpError = true;
                 }
             });
         }
@@ -175,18 +188,25 @@ namespace THUFlightDataAdapterApp
                             }
                             else
                             {
-                                tcpClient.Send(datas);
+                                tcpClient.Send(packetBuilder
+                                        .SetCountAndTime(count++, DateTime.UtcNow)
+                                        .SetStatus(false, false, false, 0)
+                                        .BuildCommandTotalBytes());
+                                Thread.Sleep(sendInterval);
                             }
                         }               
                     }
                 }
                 catch (Exception ex)
                 {
+                    Console.WriteLine("tcp error as follows:");
                     Console.WriteLine(ex.ToString());
+                    isTcpError = true;
                 }
             });
         }
 
+        #region Console_Delegate
         public delegate bool ControlCtrlDelegate(int CtrlType);
         [DllImport("kernel32.dll")]
         private static extern bool SetConsoleCtrlHandler(ControlCtrlDelegate HandlerRoutine, bool Add);
@@ -205,6 +225,7 @@ namespace THUFlightDataAdapterApp
             }
             return false;
         }
+        #endregion
 
         static void Main(string[] args)
         {
@@ -212,9 +233,41 @@ namespace THUFlightDataAdapterApp
             SetConsoleCtrlHandler(cancelHandler, true);
             BuildTcpUdpNet();
             UdpTask();
-            TcpTask();
-            Console.WriteLine("Press to exit");
-            Console.ReadLine();
+            if (isUseTCP == true)
+                TcpTask();
+            Console.WriteLine("Press enter to exit");
+            while (true)
+            {
+                var line = Console.ReadLine();
+                if (line == "exit")
+                    break;
+                if (line == "udp")
+                {
+                    Console.WriteLine($"udp state is {isRevcUdp} and error is {isUdpError}");
+                }
+                if (line == "tcp")
+                {
+                    Console.WriteLine($"tcp state is {isConnectTcp} and error is {isUdpError}");
+                }
+                if (line == "me" || line == "self")
+                {
+                    Console.WriteLine($"me is {WswHelper.GetFlightKindFromIp(comConfig.SelfIp)}");
+                }
+                if (line == "run udp" && isUdpError == true)
+                {
+                    UdpTask();
+                    Console.WriteLine("udp run success");
+                }
+                if (line == "run tcp" && isUseTCP == true && isTcpError == true)
+                {
+                    TcpTask();
+                    Console.WriteLine("tcp run success");
+                }
+                if (line == "config")
+                {
+                    Process.Start(JsonFileConfig.PathAndFileName);
+                }
+            }
             CloseTcpUdpNet();
         }
 

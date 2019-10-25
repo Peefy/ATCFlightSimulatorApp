@@ -39,7 +39,7 @@ namespace THUFlightDataAdapterApp.Util
             int num = Marshal.SizeOf(type);
             if (num > bytes.Length)
             {
-                return default;
+                return default(T);
             }
             IntPtr intPtr = Marshal.AllocHGlobal(num);
             Marshal.Copy(bytes, 0, intPtr, num);

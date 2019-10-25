@@ -90,9 +90,10 @@ namespace THUFlightDataAdapterApp.Util
         /// <returns></returns>
         public static double XYZToHeight(double x, double y, double z)
         {
+            var heightOffset = 296.0;
             var earthRadius = 6378137.0;
             var e2 = 0.00669437999013;
-            var height = Math.Sqrt((x * x + y * y + z * z) / ((1 - e2 * e2) * (1 - e2 * e2))) - earthRadius;
+            var height = Math.Sqrt((x * x + y * y + z * z) / ((1 - e2 * e2) * (1 - e2 * e2))) - earthRadius - heightOffset;
             return height;
         }
     }

@@ -20,7 +20,19 @@ namespace THUFlightDataAdapterApp.Util.JsonModels
         public int SelfPort { get; set; } = 16000;
 
         [JsonProperty("aTCSimulatorIp")]
-        public string ATCSimulatorIp { get; set; } = "192.168.0.160";
+        public string ATCSimulatorIp { get; set; } = "192.168.0.100";
+
+        [JsonProperty("aTCSimulatorRadarIp")]
+        public string ATCSimulatorRadarIp { get; set; } = "192.168.0.101";
+
+        [JsonProperty("aTCSimulatorSim1Ip")]
+        public string ATCSimulatorSim1Ip { get; set; } = "192.168.0.201";
+
+        [JsonProperty("aTCSimulatorSim2Ip")]
+        public string ATCSimulatorSim2Ip { get; set; } = "192.168.0.202";
+
+        [JsonProperty("aTCSimulatorSim3Ip")]
+        public string ATCSimulatorSim3Ip { get; set; } = "192.168.0.203";
 
         [JsonProperty("aTCSimulatorPort")]
         public int ATCSimulatorPort { get; set; } = 7109;

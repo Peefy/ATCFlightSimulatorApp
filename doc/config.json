@@ -1,0 +1,14 @@
+{
+  "comConfig": {
+    "selfPort": 16000,
+    "aTCSimulatorIp": "192.168.0.100",
+    "aTCSimulatorPort": 7109,
+    "sendDataIntervalMs": 30,
+    "ip720Platform": "192.168.0.136",
+    "ip720Platform2": "192.168.0.137",
+    "ipWswUdpServer": "192.168.0.131",
+    "ipGunBarrel": "192.168.0.133",
+    "selfIp ": "192.168.0.136",
+    "wswUdpPort": 14000
+  }
+}
