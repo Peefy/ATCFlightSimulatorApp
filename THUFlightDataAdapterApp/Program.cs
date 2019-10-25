@@ -23,35 +23,47 @@ namespace THUFlightDataAdapterApp
         static Socket tcpClient;
         static ComConfig comConfig;
         static ATCDataPacketBuilder packetBuilder;
-        const int sendInterval = 27;
+        const int sendInterval = 20;
         static readonly bool isTest = false;
-        static readonly bool isUseTCP = false;
+        static readonly bool isUseTCP = true;
+        static bool isAutoConnectTcp = true;
         static bool isConnectTcp = false;
         static bool isRevcUdp = false;
-        static bool isTcpError = false;
+        static bool isTcpError = true;
         static bool isUdpError = false;
+        static int udpCount = 0;
+
+        static void DoTcpConnect()
+        {
+        retry:
+            try
+            {
+
+                if (isUseTCP == true)
+                {
+                    Console.WriteLine("Connect server ing...");
+                    tcpClient.Connect(comConfig.ATCSimulatorIp, comConfig.ATCSimulatorPort);
+                    Console.WriteLine("Connect server success!");
+                    isConnectTcp = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Connect server failure! The reason as follows");
+                Console.WriteLine(ex.Message.ToString());
+                Thread.Sleep(100);
+                goto retry;
+            }
+        }
 
         static void BuildTcpUdpNet()
         {
             lockobj = new object();
             packetBuilder = new ATCDataPacketBuilder();
             comConfig = JsonFileConfig.Instance.ComConfig;
+            Console.WriteLine($"Me is {WswHelper.GetFlightKindFromIp(comConfig.SelfIp)}");
             udpClient = new UdpClient(comConfig.SelfPort);
             tcpClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            try
-            {
-                if (isUseTCP == true)
-                {
-                    tcpClient.Connect(comConfig.ATCSimulatorIp, comConfig.ATCSimulatorPort);
-                    Console.WriteLine("Connect server success!");
-                    isConnectTcp = true;
-                }
-            }   
-            catch (Exception ex)
-            {
-                Console.WriteLine("Connect server failure! The reason as follows");
-                Console.WriteLine(ex.Message.ToString());
-            }
         }
 
         private static void CloseTcpUdpNet()
@@ -62,7 +74,8 @@ namespace THUFlightDataAdapterApp
             }
             if (tcpClient != null && isUseTCP == true)
             {
-                tcpClient.Disconnect(false);
+                if (tcpClient.Connected == true)
+                    tcpClient.Disconnect(false);
             }
         }
 
@@ -79,22 +92,25 @@ namespace THUFlightDataAdapterApp
                         var recieveBytes = udpClient.Receive(ref ipEndPoint);
                         var ip = ipEndPoint.Address.ToString();
                         var length = recieveBytes.Length;
-                        isRevcUdp = true;
-                        if (length == StructHelper.GetStructSize<AngleWithLocation>() && ip.StartsWith(comConfig.SelfIp) == true)
+                        if (length == StructHelper.GetStructSize<AngleWithLocation>() && 
+                            (ip.StartsWith(comConfig.SelfIp) == true || ip.StartsWith("127.0.0.1")))
                         {
-                            // 地球坐标系坐标 x y z roll pitch yaw
+                            // 地球坐标系坐标 x y z roll pitch yaw                 
                             var angleWithLocation = StructHelper.BytesToStruct<AngleWithLocation>(recieveBytes);
                             var lon = PositionHelper.XYZToLon(angleWithLocation.X, angleWithLocation.Y, angleWithLocation.Z);
                             var lat = PositionHelper.XYZToLat(angleWithLocation.X, angleWithLocation.Y, angleWithLocation.Z);
                             var height = PositionHelper.XYZToHeight(angleWithLocation.X, angleWithLocation.Y, angleWithLocation.Z);
-                            var rolldeg = Rad2Deg(angleWithLocation.Roll);
-                            var pitchdeg = Rad2Deg(angleWithLocation.Pitch);
-                            var yawdeg = Rad2Deg(angleWithLocation.Yaw);
+                            var rolldeg = (angleWithLocation.Roll);
+                            var pitchdeg = (angleWithLocation.Pitch);
+                            var yawdeg = (angleWithLocation.Yaw);
                             var kind = WswHelper.GetFlightKindFromIp(ip);
+                            udpCount++;
+                            isRevcUdp = true;
                             lock (lockobj)
                             {
                                 packetBuilder.SetAngles(rolldeg, pitchdeg, yawdeg)
                                     .SetPositions(lon, lat, height)
+                                    .SetStatus(true, false, true, 80)
                                     .SetFlightSimulatorKind(kind);
                             }
                         }
@@ -190,11 +206,10 @@ namespace THUFlightDataAdapterApp
                             {
                                 tcpClient.Send(packetBuilder
                                         .SetCountAndTime(count++, DateTime.UtcNow)
-                                        .SetStatus(false, false, false, 0)
-                                        .BuildCommandTotalBytes());
-                                Thread.Sleep(sendInterval);
+                                        .BuildCommandTotalBytes());  
                             }
-                        }               
+                        }
+                        Thread.Sleep(sendInterval);
                     }
                 }
                 catch (Exception ex)
@@ -202,6 +217,23 @@ namespace THUFlightDataAdapterApp
                     Console.WriteLine("tcp error as follows:");
                     Console.WriteLine(ex.ToString());
                     isTcpError = true;
+                }
+            });
+        }
+
+        static void TcpAutoConnectTask()
+        {
+            Task.Run(() =>
+            {
+                while (true)
+                {
+                    if (isAutoConnectTcp == true && isUseTCP == true && isTcpError == true)
+                    {
+                        isTcpError = false;
+                        DoTcpConnect();
+                        TcpTask();
+                    }
+                    Thread.Sleep(100);
                 }
             });
         }
@@ -227,15 +259,19 @@ namespace THUFlightDataAdapterApp
         }
         #endregion
 
-        static void Main(string[] args)
+        static void ShowHeaderInfo()
         {
             Console.WriteLine("THU ATC Data Adapter");
+        }
+
+        static void Main(string[] args)
+        {
+            ShowHeaderInfo();
             SetConsoleCtrlHandler(cancelHandler, true);
             BuildTcpUdpNet();
             UdpTask();
-            if (isUseTCP == true)
-                TcpTask();
-            Console.WriteLine("Press enter to exit");
+            TcpAutoConnectTask();
+            Console.WriteLine("Press enter to exit");        
             while (true)
             {
                 var line = Console.ReadLine();
@@ -243,15 +279,15 @@ namespace THUFlightDataAdapterApp
                     break;
                 if (line == "udp")
                 {
-                    Console.WriteLine($"udp state is {isRevcUdp} and error is {isUdpError}");
+                    Console.WriteLine($"udp state is {isRevcUdp}, count is {udpCount} and error is {isUdpError}");
                 }
                 if (line == "tcp")
                 {
-                    Console.WriteLine($"tcp state is {isConnectTcp} and error is {isUdpError}");
+                    Console.WriteLine($"tcp state is {isConnectTcp} and error is {isTcpError}");
                 }
                 if (line == "me" || line == "self")
                 {
-                    Console.WriteLine($"me is {WswHelper.GetFlightKindFromIp(comConfig.SelfIp)}");
+                    Console.WriteLine($"Me is {WswHelper.GetFlightKindFromIp(comConfig.SelfIp)}");
                 }
                 if (line == "run udp" && isUdpError == true)
                 {
@@ -260,6 +296,7 @@ namespace THUFlightDataAdapterApp
                 }
                 if (line == "run tcp" && isUseTCP == true && isTcpError == true)
                 {
+                    DoTcpConnect();
                     TcpTask();
                     Console.WriteLine("tcp run success");
                 }

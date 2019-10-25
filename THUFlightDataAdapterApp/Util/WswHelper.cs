@@ -52,22 +52,24 @@ namespace THUFlightDataAdapterApp.Util
     public class PositionHelper
     {
         /// <summary>
-        /// 地球坐标系坐标转经纬度坐标
+        /// 地球坐标系坐标转经度坐标
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <returns></returns>
         public static double XYZToLon(double x, double y, double z)
         {
+            // 1秒大概30m
+            var lonoffset = -1.5 / 3600.0;
             var pi = Math.PI;
             var lon = Math.Atan2(y, x) * 180.0 / pi;
             if (lon < 0)
                 lon = 180 + lon;
-            return lon;
+            return lon + lonoffset;
         }
 
         /// <summary>
-        /// 地球坐标系坐标转经纬度坐标
+        /// 地球坐标系坐标转纬度坐标
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
@@ -75,10 +77,11 @@ namespace THUFlightDataAdapterApp.Util
         /// <returns></returns>
         public static double XYZToLat(double x, double y, double z)
         {
+            var latoffset = 1.0 / 3600.0;
             var pi = Math.PI;
             var e2 = 0.00669437999013;
             var lat = Math.Atan2(z, Math.Sqrt(x * x + y * y) * (1 - e2 * e2)) * 180.0 / pi;
-            return lat;
+            return lat + latoffset;
         }
 
         /// <summary>

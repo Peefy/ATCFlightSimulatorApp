@@ -17,7 +17,7 @@ namespace THUFlightDataAdapterApp.Util.JsonModels
         /// 自己PC设备Udp的监听端口号
         /// </summary>
         [JsonProperty("selfPort")]
-        public int SelfPort { get; set; } = 16000;
+        public int SelfPort { get; set; } = 15000;
 
         [JsonProperty("aTCSimulatorIp")]
         public string ATCSimulatorIp { get; set; } = "192.168.0.100";

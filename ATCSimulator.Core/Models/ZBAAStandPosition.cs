@@ -42,6 +42,19 @@ namespace ATCSimulator.Models
             };
         }
 
+        public static ZBAAStandPosition New(string line)
+        {
+            var lines = line.Split(',', ' ');
+            return new ZBAAStandPosition()
+            {
+                Name = lines[0],
+                Latitude = float.Parse(lines[3]),
+                Lontitude = float.Parse(lines[4]),
+                InitialHeading = float.Parse(lines[5]),
+                InitialAltitude = float.Parse(lines[6])
+            };
+        }
+
     }
         
 }

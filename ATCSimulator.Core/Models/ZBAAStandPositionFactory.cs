@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.IO;
+using System.Collections.Generic;
 
 namespace ATCSimulator.Models
 {
-    public class ZBAAStandPositionFactory
+    public static class ZBAAStandPositionFactory
     {
         private static Dictionary<string, ZBAAStandPosition> _positions
             = new Dictionary<string, ZBAAStandPosition>
@@ -31,6 +33,17 @@ namespace ATCSimulator.Models
                 { "M01", ZBAAStandPosition.New("M01", 40.09573282f, 116.6079884f, 83.0f,  36.0f) },
                 { "M02", ZBAAStandPosition.New("M02", 40.09644277f, 116.6078723f, 83.0f,  36.0f) }
             };
+
+        public static void UpdateFromCsvFile(string filename)
+        {
+            var lines = File.ReadAllLines(filename);
+            _positions.Clear();
+            for (int i = 1;i < lines.Length ;++i)
+            {
+                var position = ZBAAStandPosition.New(lines[i]);
+                _positions.Add(position.Name, position);
+            }
+        }
 
         public static ZBAAStandPosition Get(string name)
         {

@@ -99,6 +99,8 @@ namespace ATCSimulator.Models
             _packet.Roll = Convert.ToSingle(roll);
             _packet.Pitch = Convert.ToSingle(pitch);
             _packet.Yaw = Convert.ToSingle(yaw);
+            _packet.TrackAngle = Convert.ToSingle(yaw);
+            _packet.SideSlipAngle = 0;
             return this;
         }
 
@@ -113,7 +115,7 @@ namespace ATCSimulator.Models
         {
             _packet.Longitude = lon;
             _packet.Latitude = lat;
-            _packet.Altitude = height;
+            _packet.Altitude = height; 
             return this;
         }
 
@@ -143,8 +145,8 @@ namespace ATCSimulator.Models
                     numBytes = System.Text.Encoding.ASCII.GetBytes("EH1001");
                     break;
                 case WswModelKind.CJ6:
-                    kindBytes = System.Text.Encoding.ASCII.GetBytes("CJ6 ");
-                    numBytes = System.Text.Encoding.ASCII.GetBytes("CJ6-01");
+                    kindBytes = System.Text.Encoding.ASCII.GetBytes("CJ6" + '\0');
+                    numBytes = System.Text.Encoding.ASCII.GetBytes("CJ601" + '\0');
                     break;
                 case WswModelKind.F18:
                     kindBytes = System.Text.Encoding.ASCII.GetBytes("F18H");
