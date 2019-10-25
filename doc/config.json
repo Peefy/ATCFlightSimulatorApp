@@ -2,6 +2,10 @@
   "comConfig": {
     "selfPort": 16000,
     "aTCSimulatorIp": "192.168.0.100",
+    "aTCSimulatorRadarIp": "192.168.0.101",
+    "aTCSimulatorSim1Ip": "192.168.0.201",
+    "aTCSimulatorSim2Ip": "192.168.0.202",
+    "aTCSimulatorSim3Ip": "192.168.0.203",
     "aTCSimulatorPort": 7109,
     "sendDataIntervalMs": 30,
     "ip720Platform": "192.168.0.136",

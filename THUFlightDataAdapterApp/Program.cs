@@ -267,6 +267,11 @@ namespace THUFlightDataAdapterApp
                 {
                     Process.Start(JsonFileConfig.PathAndFileName);
                 }
+                if (line == "save config")
+                {
+                    JsonFileConfig.Instance.WriteToFile();
+                    Console.WriteLine("save file success");
+                }
             }
             CloseTcpUdpNet();
         }
