@@ -77,7 +77,7 @@ namespace THUFlightDataAdapterApp.Util
         /// <returns></returns>
         public static double XYZToLat(double x, double y, double z)
         {
-            var latoffset = 1.0 / 3600.0;
+            var latoffset = 2.0 / 3600.0;
             var pi = Math.PI;
             var e2 = 0.00669437999013;
             var lat = Math.Atan2(z, Math.Sqrt(x * x + y * y) * (1 - e2 * e2)) * 180.0 / pi;

@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Net;
 using System.Net.Sockets;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 
@@ -11,8 +12,6 @@ using THUFlightDataAdapterApp.Model;
 using THUFlightDataAdapterApp.Util;
 using THUFlightDataAdapterApp.Util.JsonModels;
 
-using static THUFlightDataAdapterApp.Util.MathUtil;
-using System.Diagnostics;
 
 namespace THUFlightDataAdapterApp
 {
@@ -111,7 +110,7 @@ namespace THUFlightDataAdapterApp
                                 packetBuilder.SetAngles(rolldeg, pitchdeg, yawdeg)
                                     .SetPositions(lon, lat, height)
                                     .SetStatus(true, false, true, 80)
-                                    .SetFlightSimulatorKind(kind);
+                                    .SetFlightSimulatorKind(WswModelKind.EH101);
                             }
                         }
                     }
