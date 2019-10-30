@@ -22,7 +22,7 @@ namespace THUFlightDataAdapterApp
         static Socket tcpClient;
         static ComConfig comConfig;
         static ATCDataPacketBuilder packetBuilder;
-        const int sendInterval = 20;
+        static int sendInterval = 20;
         static readonly bool isTest = true;
         static readonly bool isUseTCP = true;
         static bool isAutoConnectTcp = true;
