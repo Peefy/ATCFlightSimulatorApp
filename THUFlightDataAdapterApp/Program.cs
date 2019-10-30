@@ -23,8 +23,8 @@ namespace THUFlightDataAdapterApp
         static ComConfig comConfig;
         static ATCDataPacketBuilder packetBuilder;
         static int sendInterval = 20;
-        static readonly bool isTest = true;
-        static readonly bool isUseTCP = true;
+        static bool isTest = true;
+        static bool isUseTCP = true;
         static bool isAutoConnectTcp = true;
         static bool isConnectTcp = false;
         static bool isRevcUdp = false;
@@ -63,6 +63,8 @@ namespace THUFlightDataAdapterApp
             Console.WriteLine($"Me is {WswHelper.GetFlightKindFromIp(comConfig.SelfIp)}");
             udpClient = new UdpClient(comConfig.SelfPort);
             tcpClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            sendInterval = comConfig.SendDataIntervalMs;
+            isTest = comConfig.IsTCPTest;
         }
 
         private static void CloseTcpUdpNet()
@@ -266,6 +268,7 @@ namespace THUFlightDataAdapterApp
         static void Main(string[] args)
         {
             ShowHeaderInfo();
+            JsonFileConfig.Instance.WriteToFile();
             SetConsoleCtrlHandler(cancelHandler, true);
             BuildTcpUdpNet();
             UdpTask();
