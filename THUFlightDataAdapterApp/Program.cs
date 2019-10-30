@@ -268,7 +268,6 @@ namespace THUFlightDataAdapterApp
         static void Main(string[] args)
         {
             ShowHeaderInfo();
-            JsonFileConfig.Instance.WriteToFile();
             SetConsoleCtrlHandler(cancelHandler, true);
             BuildTcpUdpNet();
             UdpTask();
