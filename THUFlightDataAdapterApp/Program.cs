@@ -23,7 +23,7 @@ namespace THUFlightDataAdapterApp
         static ComConfig comConfig;
         static ATCDataPacketBuilder packetBuilder;
         const int sendInterval = 20;
-        static readonly bool isTest = false;
+        static readonly bool isTest = true;
         static readonly bool isUseTCP = true;
         static bool isAutoConnectTcp = true;
         static bool isConnectTcp = false;
@@ -144,7 +144,7 @@ namespace THUFlightDataAdapterApp
                                 {
                                     tcpClient.Send(new ATCDataPacketBuilder()
                                         .SetCountAndTime(count, DateTime.UtcNow)
-                                        .SetStatus(false, false, false, 0)
+                                        .SetStatus(true, true, true, 40 )
                                         .SetAngles(0, 0, stand806.InitialHeading)
                                         .SetFlightSimulatorKind(WswModelKind.CJ6)
                                         .SetPositions(stand806.Lontitude, stand806.Latitude, stand806.InitialAltitude)
@@ -153,7 +153,7 @@ namespace THUFlightDataAdapterApp
 
                                     tcpClient.Send(new ATCDataPacketBuilder()
                                         .SetCountAndTime(count, DateTime.UtcNow)
-                                        .SetStatus(false, false, false, 0)
+                                        .SetStatus(true, true, true, 40)
                                         .SetAngles(0, 0, stand808.InitialHeading)
                                         .SetFlightSimulatorKind(WswModelKind.F18)
                                         .SetPositions(stand808.Lontitude, stand808.Latitude, stand808.InitialAltitude)                                    
@@ -162,7 +162,7 @@ namespace THUFlightDataAdapterApp
 
                                     tcpClient.Send(new ATCDataPacketBuilder()
                                         .SetCountAndTime(count, DateTime.UtcNow)
-                                        .SetStatus(false, false, false, 0)
+                                        .SetStatus(true, true, true, 40)
                                         .SetAngles(0, 0, stand810.InitialHeading)
                                         .SetFlightSimulatorKind(WswModelKind.EH101)
                                         .SetPositions(stand810.Lontitude, stand810.Latitude, stand810.InitialAltitude)
