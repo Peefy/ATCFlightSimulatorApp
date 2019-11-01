@@ -17,39 +17,76 @@ namespace THUFlightDataAdapterApp
 {
     class Program
     {
+        /// <summary>
+        /// 线程锁
+        /// </summary>
         static object lockobj;
+        /// <summary>
+        /// UDP客户端，用于接收飞行模拟器数据
+        /// </summary>
         static UdpClient udpClient;
-        static Socket tcpClient;
+        /// <summary>
+        /// TCP客户端，用于给空管模拟器发送数据
+        /// </summary>
+        static TcpClient tcpClient;
+        /// <summary>
+        /// 读配置文件
+        /// </summary>
         static ComConfig comConfig;
+        /// <summary>
+        /// 构造发送数据
+        /// </summary>
         static ATCDataPacketBuilder packetBuilder;
+        /// <summary>
+        /// 默认发送间隔
+        /// </summary>
         static int sendInterval = 20;
-        static bool isTest = true;
+        /// <summary>
+        /// 是否是TCP测试软件
+        /// </summary>
+        static bool isTest = false;
+        /// <summary>
+        /// 是否使用TCP
+        /// </summary>
         static bool isUseTCP = true;
-        static bool isAutoConnectTcp = true;
-        static bool isConnectTcp = false;
+        /// <summary>
+        /// 是否接收到UDP数据包
+        /// </summary>
         static bool isRevcUdp = false;
+        /// <summary>
+        /// 是否TCP异常
+        /// </summary>
         static bool isTcpError = true;
+        /// <summary>
+        /// 是否UDP异常
+        /// </summary>
         static bool isUdpError = false;
+        /// <summary>
+        /// UDP接收数据包个数
+        /// </summary>
         static int udpCount = 0;
 
+        /// <summary>
+        /// TCP客户端连接服务端
+        /// </summary>
         static void DoTcpConnect()
         {
         retry:
             try
             {
 
-                if (isUseTCP == true)
+                if (isUseTCP == true && tcpClient.Connected == false)
                 {
                     Console.WriteLine("Connect server ing...");
                     tcpClient.Connect(comConfig.ATCSimulatorIp, comConfig.ATCSimulatorPort);
                     Console.WriteLine("Connect server success!");
-                    isConnectTcp = true;
+                    isTcpError = false;
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Connect server failure! The reason as follows");
-                Console.WriteLine(ex.Message.ToString());
+                Console.WriteLine(ex.ToString());
                 Thread.Sleep(100);
                 goto retry;
             }
@@ -62,7 +99,7 @@ namespace THUFlightDataAdapterApp
             comConfig = JsonFileConfig.Instance.ComConfig;
             Console.WriteLine($"Me is {WswHelper.GetFlightKindFromIp(comConfig.SelfIp)}");
             udpClient = new UdpClient(comConfig.SelfPort);
-            tcpClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            tcpClient = new TcpClient();
             sendInterval = comConfig.SendDataIntervalMs;
             isTest = comConfig.IsTCPTest;
         }
@@ -76,7 +113,7 @@ namespace THUFlightDataAdapterApp
             if (tcpClient != null && isUseTCP == true)
             {
                 if (tcpClient.Connected == true)
-                    tcpClient.Disconnect(false);
+                    tcpClient.Close();
             }
         }
 
@@ -144,7 +181,7 @@ namespace THUFlightDataAdapterApp
                             {                     
                                 if ((count / 667) % 2 == 0)
                                 {
-                                    tcpClient.Send(new ATCDataPacketBuilder()
+                                    tcpClient.Client.Send(new ATCDataPacketBuilder()
                                         .SetCountAndTime(count, DateTime.UtcNow)
                                         .SetStatus(true, true, true, 40 )
                                         .SetAngles(0, 0, stand806.InitialHeading)
@@ -153,7 +190,7 @@ namespace THUFlightDataAdapterApp
                                         .BuildCommandTotalBytes());
                                     Thread.Sleep(sendInterval / 3);
 
-                                    tcpClient.Send(new ATCDataPacketBuilder()
+                                    tcpClient.Client.Send(new ATCDataPacketBuilder()
                                         .SetCountAndTime(count, DateTime.UtcNow)
                                         .SetStatus(true, true, true, 40)
                                         .SetAngles(0, 0, stand808.InitialHeading)
@@ -162,7 +199,7 @@ namespace THUFlightDataAdapterApp
                                         .BuildCommandTotalBytes());
                                     Thread.Sleep(sendInterval / 3);
 
-                                    tcpClient.Send(new ATCDataPacketBuilder()
+                                    tcpClient.Client.Send(new ATCDataPacketBuilder()
                                         .SetCountAndTime(count, DateTime.UtcNow)
                                         .SetStatus(true, true, true, 40)
                                         .SetAngles(0, 0, stand810.InitialHeading)
@@ -174,7 +211,7 @@ namespace THUFlightDataAdapterApp
                                 }
                                 else if ((count / 667) % 2 == 1)
                                 {
-                                    tcpClient.Send(new ATCDataPacketBuilder()
+                                    tcpClient.Client.Send(new ATCDataPacketBuilder()
                                         .SetCountAndTime(count, DateTime.UtcNow)
                                         .SetStatus(true, true, true, 50)
                                         .SetAngles(-10, 20, stand806.InitialHeading)
@@ -183,7 +220,7 @@ namespace THUFlightDataAdapterApp
                                         .BuildCommandTotalBytes());
                                     Thread.Sleep(sendInterval / 3);
 
-                                    tcpClient.Send(new ATCDataPacketBuilder()
+                                    tcpClient.Client.Send(new ATCDataPacketBuilder()
                                         .SetCountAndTime(count, DateTime.UtcNow)
                                         .SetStatus(true, true, true, 75)
                                         .SetAngles(30, -10, stand808.InitialHeading)
@@ -192,7 +229,7 @@ namespace THUFlightDataAdapterApp
                                         .BuildCommandTotalBytes());
                                     Thread.Sleep(sendInterval / 3);
 
-                                    tcpClient.Send(new ATCDataPacketBuilder()
+                                    tcpClient.Client.Send(new ATCDataPacketBuilder()
                                         .SetCountAndTime(count, DateTime.UtcNow)
                                         .SetStatus(true, true, true, 100)
                                         .SetAngles(30, 40, stand810.InitialHeading)
@@ -205,7 +242,7 @@ namespace THUFlightDataAdapterApp
                             }
                             else
                             {
-                                tcpClient.Send(packetBuilder
+                                tcpClient.Client.Send(packetBuilder
                                         .SetCountAndTime(count++, DateTime.UtcNow)
                                         .BuildCommandTotalBytes());  
                             }
@@ -216,25 +253,14 @@ namespace THUFlightDataAdapterApp
                 catch (Exception ex)
                 {
                     Console.WriteLine("tcp error as follows:");
-                    Console.WriteLine(ex.ToString());
+                    Console.WriteLine(ex.Message.ToString());
                     isTcpError = true;
-                }
-            });
-        }
-
-        static void TcpAutoConnectTask()
-        {
-            Task.Run(() =>
-            {
-                while (true)
-                {
-                    if (isAutoConnectTcp == true && isUseTCP == true && isTcpError == true)
+                    if (tcpClient.Connected == false)
                     {
-                        isTcpError = false;
+                        tcpClient.Close();
+                        tcpClient = new TcpClient();
                         DoTcpConnect();
-                        TcpTask();
                     }
-                    Thread.Sleep(100);
                 }
             });
         }
@@ -271,7 +297,8 @@ namespace THUFlightDataAdapterApp
             SetConsoleCtrlHandler(cancelHandler, true);
             BuildTcpUdpNet();
             UdpTask();
-            TcpAutoConnectTask();
+            DoTcpConnect();
+            TcpTask();
             Console.WriteLine("Press enter to exit");        
             while (true)
             {
@@ -284,7 +311,7 @@ namespace THUFlightDataAdapterApp
                 }
                 if (line == "tcp")
                 {
-                    Console.WriteLine($"tcp state is {isConnectTcp} and error is {isTcpError}");
+                    Console.WriteLine($"tcp state is {tcpClient.Connected} and error is {isTcpError}");
                 }
                 if (line == "me" || line == "self")
                 {
