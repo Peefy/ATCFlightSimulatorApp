@@ -149,7 +149,7 @@ namespace THUFlightDataAdapterApp
                                 packetBuilder.SetAngles(rolldeg, pitchdeg, yawdeg)
                                     .SetPositions(lon, lat, height)
                                     .SetStatus(true, false, true, 80)
-                                    .SetFlightSimulatorKind(WswModelKind.EH101);
+                                    .SetFlightSimulatorKind(kind);
                             }
                         }
                     }
