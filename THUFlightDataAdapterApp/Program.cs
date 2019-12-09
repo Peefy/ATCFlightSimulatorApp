@@ -142,6 +142,10 @@ namespace THUFlightDataAdapterApp
                             var pitchdeg = (angleWithLocation.Pitch);
                             var yawdeg = (angleWithLocation.Yaw);
                             var kind = WswHelper.GetFlightKindFromIp(ip);
+                            if (kind == WswModelKind.EH101)
+                            {
+                                rolldeg = -rolldeg; pitchdeg = -pitchdeg; yawdeg = -yawdeg;
+                            }
                             udpCount++;
                             isRevcUdp = true;
                             lock (lockobj)
